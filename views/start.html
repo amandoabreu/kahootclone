@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Quiz Master</title>
+</head>
+<body>
+    <div id="preGameSection">
+        <h1>Quiz</h1>
+        <button id="startButton">Start Quiz</button>
+        <div id="playerList"></div>
+    </div>
+
+    <div id="questionSection" style="display: none;">
+        <h2>Current Question: <span id="questionNumber"></span></h2>
+        <p id="questionText"></p>
+        <img id="questionImage" src="" alt="Question Image">
+        <p>Time remaining: <span id="countdown">-</span></p>
+        <div id="playerAnswers"></div>
+        <button id="nextButton" style="display: none;">Next Question</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        socket.emit('joinRoom', 'master');
+
+        let currentQuestionNumber = 0;
+        let countdownInterval;
+
+        document.getElementById('startButton').onclick = () => {
+            socket.emit('startQuiz');
+            document.getElementById('preGameSection').style.display = 'none';
+            document.getElementById('questionSection').style.display = 'block';
+        };
+
+        socket.on('addedPlayer', (playerName) => {
+            const playerDiv = document.createElement('div');
+            playerDiv.textContent = `${playerName} joined the quiz!`;
+            document.getElementById('playerList').appendChild(playerDiv);
+        });
+
+        socket.on('question', (data) => {
+            currentQuestionNumber++;
+            document.getElementById('questionNumber').textContent = currentQuestionNumber;
+            document.getElementById('questionText').textContent = data.question;
+            document.getElementById('questionImage').src = data.image;
+            document.getElementById('playerAnswers').innerHTML = '';
+            document.getElementById('nextButton').style.display = 'none';
+            
+            let timeLeft = data.timeLimit || 30;
+            document.getElementById('countdown').textContent = timeLeft;
+            
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('countdown').textContent = timeLeft;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('nextButton').style.display = 'block';
+                }
+            }, 1000);
+        });
+
+        socket.on('playerAnswered', (playerName) => {
+            const answerDiv = document.createElement('div');
+            answerDiv.textContent = `${playerName} has answered!`;
+            document.getElementById('playerAnswers').appendChild(answerDiv);
+        });
+
+        document.getElementById('nextButton').onclick = () => {
+            socket.emit('nextQuestion');
+        };
+    </script>
+
+    <style>
+        #playerAnswers div {
+            margin: 10px 0;
+            padding: 5px;
+            background-color: #f0f0f0;
+        }
+    </style>
+</body>
+</html>

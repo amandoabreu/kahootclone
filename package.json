@@ -1,0 +1,17 @@
+{
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "browser-sync": "^3.0.3",
+    "concurrently": "^9.1.0",
+    "nodemon": "^3.1.7"
+  },
+  "scripts": {
+    "dev": "nodemon server.js",
+    "ui": "browser-sync start --config bs-config.js",
+    "start": "concurrently \"npm run dev\" \"npm run ui\""
+}
+}

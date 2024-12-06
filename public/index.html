@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Kahoot Clone</title>
+</head>
+<body>
+    <div id="join">
+    <h1>Join the Quiz</h1>
+    <input type="text" id="nameInput" placeholder="Your Name">
+    <button id="joinBtn">Join</button>
+    </div>
+
+    <div id="waiting" style="display: none;">
+      <h2>Welcome to the Quiz!</h2>
+      <p>Waiting for the quiz master to start the game...</p>
+    </div>
+
+  <div id="quiz" style="display: none;">
+    <h2 class="question"></h2>
+    <form id="answerForm">
+      <input type="text" id="answerInput" placeholder="Your Answer">
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+
+  <div id="endGameSection" style="display: none;">
+    <h2>Quiz Complete!</h2>
+    <div id="winnersDisplay"></div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    
+    // Join
+    document.getElementById('joinBtn').onclick = () => {
+      const name = document.getElementById('nameInput').value.trim();
+      if (name) {
+        socket.emit('joinQuiz', name);
+        document.getElementById('join').style.display = 'none';
+        document.getElementById('waiting').style.display = 'block';
+      }
+    };
+
+    // Show question
+    socket.on('question', (data) => {
+      document.getElementById('waiting').style.display = 'none';
+      document.querySelector('#answerForm').style.display = 'block';
+      document.querySelector('#answerForm').style.display = 'blo';
+      console.log(data);
+      const quizDiv = document.getElementById('quiz');
+      quizDiv.style.display = 'block';
+      quizDiv.querySelector('.question').textContent = data.question;
+    });
+
+    // Handle answer submission
+    document.getElementById('answerForm').onsubmit = (e) => {
+      e.preventDefault(); // Prevent page refresh
+      const answer = document.getElementById('answerInput').value.trim();
+      if (answer) {
+        socket.emit('submitAnswer', answer);
+        document.getElementById('answerInput').value = '';
+        document.querySelector('.question').textContent = 'Answer submitted! Waiting for next question...';
+        document.querySelector('#answerForm').style.display = 'none';
+      }
+    };
+
+    let winners = [];
+    socket.on('quizEnd', (scores) => {
+      console.log('Quiz ended, received scores:', scores);
+      document.getElementById('quiz').style.display = 'none';
+      document.getElementById('endGameSection').style.display = 'block';
+      winners = scores;
+    });
+
+    socket.on('revealWinner', (winnerData) => {
+      const winnerElement = document.createElement('div');
+      winnerElement.className = 'winner-entry';
+      winnerElement.innerHTML = `
+        <h3>${winnerData.place}${getOrdinalSuffix(winnerData.place)} Place</h3>
+        <p>${winnerData.name} - ${winnerData.score} points</p>
+      `;
+      
+      const winnersDisplay = document.getElementById('winnersDisplay');
+      winnersDisplay.insertBefore(winnerElement, winnersDisplay.firstChild);
+    });
+
+    function getOrdinalSuffix(i) {
+      const j = i % 10;
+      const k = i % 100;
+      if (j == 1 && k != 11) return "st";
+      if (j == 2 && k != 12) return "nd";
+      if (j == 3 && k != 13) return "rd";
+      return "th";
+    }
+  </script>
+
+  <style>
+    #endGameSection {
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .winner-entry {
+        margin: 20px auto;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        max-width: 400px;
+        animation: slideIn 0.5s ease-out;
+    }
+
+    @keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+  </style>
+</body>
+</html>
