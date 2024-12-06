@@ -53,7 +53,7 @@
                 { "text": "Thailand", "isCorrect": false }
             ],
             "timeLimit": 25,
-            "image": "https://photos.smugmug.com/Gallery/Australia/Christmas-Island/i-Rb5PVvm/1/M7gPTNphhxgH78sDjHhBtnrSSJ4BzzCkZkQbkqMV6/L/Photo%2074-L.jpg"
+            "image": "/images/christmas.jpg"
         },
         {
             "questionId": 6,
