@@ -12,6 +12,6 @@
   "scripts": {
     "dev": "nodemon server.js",
     "ui": "browser-sync start --config bs-config.js",
-    "start": "concurrently \"npm run dev\" \"npm run ui\""
+    "start": "node server.js"
 }
 }

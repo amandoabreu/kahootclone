@@ -35,7 +35,7 @@
             max-width: 300px;
         }
 
-        #joinBtn {
+        #joinButton {
             background-color: #26890c;
             color: white;
             border: none;
@@ -46,7 +46,7 @@
             transition: background-color 0.3s;
         }
 
-        #joinBtn:hover {
+        #joinButton:hover {
             background-color: #1e6b09;
         }
 
@@ -122,13 +122,56 @@
                 width: 90%;
             }
         }
+
+        #multipleChoiceAnswers {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        #multipleChoiceAnswers button {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background-color: #fff;
+            color: #333;
+            margin: 0 4px;
+            transition: background-color 0.3s;
+        }
+
+        #multipleChoiceAnswers button:hover {
+            background-color: #e0e0e0;
+        }
+
+        #multipleChoiceAnswers button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Add some styling for the waiting message */
+        #waitingNextQuestion {
+            text-align: center;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
-    <div id="join">
-    <h1>Join the Quiz</h1>
-    <input type="text" id="nameInput" placeholder="Your Name">
-    <button id="joinBtn">Join</button>
+    <div id="joinSection">
+        <h1>Join Quiz</h1>
+        <input type="text" id="nameInput" placeholder="Enter your name">
+        <button id="joinButton">Join</button>
     </div>
 
     <div id="waiting" style="display: none;">
@@ -136,85 +179,119 @@
       <p>Waiting for the quiz master to start the game...</p>
     </div>
 
-  <div id="quiz" style="display: none;">
-    <h2 class="question"></h2>
-    <form id="answerForm">
-      <input type="text" id="answerInput" placeholder="Your Answer">
-      <button type="submit" id="submitAnswer">Submit</button>
-    </form>
-  </div>
+    <div id="quiz" style="display: none;">
+        <div id="questionText" class="question"></div>
+        
+        <!-- Multiple choice buttons -->
+        <div id="multipleChoiceAnswers" style="display: none;">
+            <!-- Buttons will be added here dynamically -->
+        </div>
 
-  <div id="endGameSection" style="display: none;">
-    <h1>Quiz Complete! 🎉</h1>
-    <p>Thanks for playing!</p>
-  </div>
+        <!-- Open ended form -->
+        <form id="answerForm" style="display: none;">
+            <input type="text" id="answerInput" placeholder="Your answer">
+            <button type="submit" id="submitAnswer">Submit Answer</button>
+        </form>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script>
-    const socket = io();
-    
-    // Join
-    document.getElementById('joinBtn').onclick = () => {
-      const name = document.getElementById('nameInput').value.trim();
-      if (name) {
-        socket.emit('joinQuiz', name);
-        document.getElementById('join').style.display = 'none';
-        document.getElementById('waiting').style.display = 'block';
-      }
-    };
+        <!-- Add this new waiting message -->
+        <div id="waitingNextQuestion" style="display: none;">
+            <p>Answer submitted! Waiting for next question...</p>
+        </div>
+    </div>
 
-    // Show question
-    socket.on('question', (data) => {
-      document.getElementById('waiting').style.display = 'none';
-      document.querySelector('#answerForm').style.display = 'block';
-      document.querySelector('#answerForm').style.display = 'blo';
-      console.log(data);
-      const quizDiv = document.getElementById('quiz');
-      quizDiv.style.display = 'block';
-      quizDiv.querySelector('.question').textContent = data.question;
-    });
+    <div id="endGameSection" style="display: none;">
+        <h1>Quiz Complete! 🎉</h1>
+        <p>Thanks for playing!</p>
+    </div>
 
-    // Handle answer submission
-    document.getElementById('answerForm').onsubmit = (e) => {
-      e.preventDefault(); // Prevent page refresh
-      const answer = document.getElementById('answerInput').value.trim();
-      if (answer) {
-        socket.emit('submitAnswer', answer);
-        document.getElementById('answerInput').value = '';
-        document.querySelector('.question').textContent = 'Answer submitted! Waiting for next question...';
-        document.querySelector('#answerForm').style.display = 'none';
-      }
-    };
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        // Join
+        document.getElementById('joinButton').onclick = () => {
+            const name = document.getElementById('nameInput').value.trim();
+            if (name) {
+                socket.emit('joinQuiz', name);
+                document.getElementById('joinSection').style.display = 'none';
+                document.getElementById('waiting').style.display = 'block';
+            }
+        };
 
-    let winners = [];
-    socket.on('quizEnd', (scores) => {
-      console.log('Quiz ended, received scores:', scores);
-      document.getElementById('quiz').style.display = 'none';
-      document.getElementById('endGameSection').style.display = 'block';
-      winners = scores;
-    });
+        // Show question
+        socket.on('question', (data) => {
+            document.getElementById('waiting').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            document.getElementById('questionText').textContent = data.question;
+            document.getElementById('waitingNextQuestion').style.display = 'none';
+            
+            // Clear previous answers
+            document.getElementById('multipleChoiceAnswers').innerHTML = '';
+            document.getElementById('answerInput').value = '';
+            
+            if (data.type === 'multiple_choice') {
+                document.getElementById('multipleChoiceAnswers').style.display = 'block';
+                document.getElementById('answerForm').style.display = 'none';
+                
+                data.answers.forEach(answer => {
+                    const button = document.createElement('button');
+                    button.className = 'answerButton';
+                    button.textContent = answer;
+                    button.onclick = () => {
+                        socket.emit('submitAnswer', answer);
+                        // Disable all buttons and show waiting message
+                        document.getElementById('multipleChoiceAnswers').style.display = 'none';
+                        document.getElementById('waitingNextQuestion').style.display = 'block';
+                    };
+                    document.getElementById('multipleChoiceAnswers').appendChild(button);
+                });
+            } else {
+                document.getElementById('multipleChoiceAnswers').style.display = 'none';
+                document.getElementById('answerForm').style.display = 'block';
+            }
+        });
 
-    socket.on('revealWinner', (winnerData) => {
-      const winnerElement = document.createElement('div');
-      winnerElement.className = 'winner-entry';
-      winnerElement.innerHTML = `
-        <h3>${winnerData.place}${getOrdinalSuffix(winnerData.place)} Place</h3>
-        <p>${winnerData.name} - ${winnerData.score} points</p>
-      `;
-      
-      const winnersDisplay = document.getElementById('winnersDisplay');
-      winnersDisplay.insertBefore(winnerElement, winnersDisplay.firstChild);
-    });
+        // Handle answer submission for open-ended questions
+        document.getElementById('answerForm').onsubmit = (e) => {
+            e.preventDefault(); // Prevent page refresh
+            const answer = document.getElementById('answerInput').value.trim();
+            if (answer) {
+                socket.emit('submitAnswer', answer);
+                document.getElementById('answerInput').value = '';
+                document.getElementById('answerForm').style.display = 'none';
+                document.getElementById('waitingNextQuestion').style.display = 'block';
+            }
+        };
 
-    function getOrdinalSuffix(i) {
-      const j = i % 10;
-      const k = i % 100;
-      if (j == 1 && k != 11) return "st";
-      if (j == 2 && k != 12) return "nd";
-      if (j == 3 && k != 13) return "rd";
-      return "th";
-    }
-  </script>
+        let winners = [];
+        socket.on('quizEnd', (scores) => {
+            console.log('Quiz ended, received scores:', scores);
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('endGameSection').style.display = 'block';
+            winners = scores;
+        });
+
+        socket.on('revealWinner', (winnerData) => {
+            const winnerElement = document.createElement('div');
+            winnerElement.className = 'winner-entry';
+            winnerElement.innerHTML = `
+                <h3>${winnerData.place}${getOrdinalSuffix(winnerData.place)} Place</h3>
+                <p>${winnerData.name} - ${winnerData.score} points</p>
+            `;
+            
+            const winnersDisplay = document.getElementById('winnersDisplay');
+            winnersDisplay.insertBefore(winnerElement, winnersDisplay.firstChild);
+        });
+
+        function getOrdinalSuffix(i) {
+            const j = i % 10;
+            const k = i % 100;
+            if (j == 1 && k != 11) return "st";
+            if (j == 2 && k != 12) return "nd";
+            if (j == 3 && k != 13) return "rd";
+            return "th";
+        }
+    </script>
 
 </body>
 </html>

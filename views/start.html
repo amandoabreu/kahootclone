@@ -170,6 +170,12 @@
         font-weight: bold;
     }
 
+    #questionImage{
+        max-width: 70%; 
+        height: auto;
+        margin-top: 20px;
+    }
+
     @keyframes slideIn {
         to {
             opacity: 1;
@@ -191,7 +197,6 @@
         <img id="questionImage" src="" alt="Question Image">
         <p>Time remaining: <span id="countdown">-</span></p>
         <div id="playerAnswers"></div>
-        <button id="nextButton" style="display: none;">Next Question</button>
     </div>
 
     <div id="endGameSection" style="display: none;">
@@ -226,7 +231,6 @@
             document.getElementById('questionText').textContent = data.question;
             document.getElementById('questionImage').src = data.image;
             document.getElementById('playerAnswers').innerHTML = '';
-            document.getElementById('nextButton').style.display = 'none';
             
             let timeLeft = data.timeLimit || 30;
             document.getElementById('countdown').textContent = timeLeft;
@@ -238,7 +242,6 @@
                 
                 if (timeLeft <= 0) {
                     clearInterval(countdownInterval);
-                    document.getElementById('nextButton').style.display = 'block';
                 }
             }, 1000);
         });
@@ -249,9 +252,7 @@
             document.getElementById('playerAnswers').appendChild(answerDiv);
         });
 
-        document.getElementById('nextButton').onclick = () => {
-            socket.emit('nextQuestion');
-        };
+        
 
         socket.on('quizEnd', (scores) => {
             console.log('Quiz ended with scores:', scores);  // Debug log

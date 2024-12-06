@@ -5,16 +5,16 @@
             "type": "open_ended",
             "question": "What is this?",
             "correctAnswers": ["kitten", "Kitten", "cat"],
-            "timeLimit": 5,
-            "image": "/images/chicken.webp"
+            "timeLimit": 15,
+            "image": "https://d2zp5xs5cp8zlg.cloudfront.net/image-86754-800.jpg"
         },
         {
             "questionId": 2,
             "type": "open_ended",
-            "question": "Hvilken by er dette?",
-            "correctAnswers": ["Kristiansand", "kristiansand"],
-            "timeLimit": 5,
-            "image": "/images/duck.webp"
+            "question": "What is this?",
+            "correctAnswers": ["computer", "quantum computer", "quantum"],
+            "timeLimit": 15,
+            "image": "https://www.popsci.com/wp-content/uploads/2022/09/06/IMG_6219-1-scaled.jpg?quality=85&w=2560"
         },
         {
             "questionId": 3,
@@ -26,8 +26,8 @@
             { "text": "Paris", "isCorrect": true },
             { "text": "Rome", "isCorrect": false }
             ],
-            "timeLimit": 5,
-            "image": "/images/chicken.webp"
+            "timeLimit": 15,
+            "image": "https://assets.voxcity.com/uploads/blog_images/paris-blog-updated_original.jpg"
         }
     ]
   }
