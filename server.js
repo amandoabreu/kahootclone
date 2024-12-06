@@ -23,6 +23,7 @@ let quizInProgress = false;
 let playerScores = {};
 const MAX_POINTS = 1000; // Points for instant answer
 const MIN_POINTS = 100;  // Minimum points for correct answer
+let questionStartTime = null;
 
 io.on('connection', (socket) => {
   console.log('A user connected:', socket.id);
@@ -42,11 +43,43 @@ io.on('connection', (socket) => {
   });
 
   socket.on('submitAnswer', (answer) => {
-    if (players[socket.id]) {
-      players[socket.id].currentAnswer = answer;
-      // Emit to master view that this player has answered
-      io.emit('playerAnswered', players[socket.id].name);
+    if (!players[socket.id]) return;
+    
+    // Safety check for current question
+    if (currentQuestionIndex <= 0 || currentQuestionIndex > quizQuestions.length) {
+        console.log('Invalid question index:', currentQuestionIndex);
+        return;
     }
+
+    const currentQuestion = quizQuestions[currentQuestionIndex - 1];
+    if (!currentQuestion) {
+        console.log('No question found at index:', currentQuestionIndex);
+        return;
+    }
+
+    const timeElapsed = (Date.now() - questionStartTime) / 1000;
+    let isCorrect = false;
+    
+    // Now we can safely check the question type
+    if (currentQuestion.type === 'multiple_choice') {
+        const correctAnswer = currentQuestion.answers.find(a => a.isCorrect)?.text;
+        isCorrect = answer.toLowerCase() === correctAnswer.toLowerCase();
+    } else {
+        isCorrect = currentQuestion.correctAnswers.includes(answer.toLowerCase());
+    }
+
+    // Calculate points
+    let points = 0;
+    if (isCorrect) {
+        points = Math.max(MIN_POINTS, 
+            Math.floor(MAX_POINTS * (1 - timeElapsed/currentQuestion.timeLimit))
+        );
+        players[socket.id].score += points;
+        console.log(`${players[socket.id].name} scored ${points} points`);
+    }
+
+    players[socket.id].currentAnswer = answer;
+    io.emit('playerAnswered', players[socket.id].name);
   });
 
   socket.on('disconnect', () => {
@@ -92,11 +125,12 @@ function startQuiz() {
 function nextQuestion() {
   if (currentQuestionIndex >= quizQuestions.length) {
     quizInProgress = false;
-    io.emit('quizEnd', { players: formatLeaderboard() });
+    io.emit('quizEnd', formatLeaderboard());
     return;
   }
 
   const question = quizQuestions[currentQuestionIndex];
+  questionStartTime = Date.now();  // Set the start time when sending new question
 
   // Reset players' answers for the new question
   for (let pid in players) {
@@ -121,9 +155,7 @@ function nextQuestion() {
     image: question.image || null   
   };
 
-  // Send full question details to master view
   io.emit('masterQuestion', masterPayload);
-  // Send limited details to players
   io.emit('question', playerPayload);
 
   setTimeout(() => {
