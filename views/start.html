@@ -3,10 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <title>Quiz Master</title>
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #46178f;
+            color: white;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #preGameSection {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        #startButton {
+            background-color: #26890c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #startButton:hover {
+            background-color: #1e6b09;
+        }
+
+        #playerList {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        #playerList div {
+            background-color: #fff;
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            animation: popIn 0.3s ease-out;
+        }
+
+        #questionSection {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        #questionText {
+            font-size: 1.5em;
+            margin: 20px 0;
+        }
+
+        #countdown {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ff3355;
+        }
+
+        #playerAnswers {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        #playerAnswers div {
+            background-color: #fff;
+            color: #333;
+            padding: 15px;
+            border-radius: 8px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        #nextButton {
+            background-color: #ff3355;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        #nextButton:hover {
+            background-color: #e62e4c;
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        #endGameSection {
+        text-align: center;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    #showWinnersBtn {
+        background-color: #26890c;
+        color: white;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.2em;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+        margin: 20px 0;
+    }
+
+    #showWinnersBtn:hover {
+        background-color: #1e6b09;
+    }
+
+    .winner-card {
+        background-color: white;
+        color: #333;
+        padding: 20px;
+        margin: 10px auto;
+        border-radius: 8px;
+        max-width: 400px;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: slideIn 0.5s forwards;
+    }
+
+    .winner-card .place {
+        font-size: 1.2em;
+        color: #46178f;
+        font-weight: bold;
+    }
+
+    .winner-card .score {
+        color: #ff3355;
+        font-weight: bold;
+    }
+
+    @keyframes slideIn {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    </style>
 </head>
 <body>
     <div id="preGameSection">
-        <h1>Quiz</h1>
+        <h1>Not Kahoot!</h1>
         <button id="startButton">Start Quiz</button>
         <div id="playerList"></div>
     </div>
@@ -18,6 +192,12 @@
         <p>Time remaining: <span id="countdown">-</span></p>
         <div id="playerAnswers"></div>
         <button id="nextButton" style="display: none;">Next Question</button>
+    </div>
+
+    <div id="endGameSection" style="display: none;">
+        <h1>Quiz Complete!</h1>
+        <button id="revealWinnersBtn">Reveal Winners</button>
+        <div id="winnersContainer"></div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -72,6 +252,54 @@
         document.getElementById('nextButton').onclick = () => {
             socket.emit('nextQuestion');
         };
+
+        socket.on('quizEnd', (scores) => {
+            document.getElementById('questionSection').style.display = 'none';
+            document.getElementById('endGameSection').style.display = 'block';
+            
+            const showWinnersBtn = document.getElementById('revealWinnersBtn');
+            const winnersContainer = document.getElementById('winnersContainer');
+            
+            // Check if anyone scored points
+            const hasScores = scores.some(player => player.score > 0);
+            
+            if (!hasScores) {
+                showWinnersBtn.style.display = 'none';
+                winnersContainer.innerHTML = '<h2>No points scored in this quiz!</h2>';
+                return;
+            }
+            
+            showWinnersBtn.onclick = () => {
+                showWinnersBtn.style.display = 'none';
+                let delay = 0;
+                
+                // Show winners from last to first
+                scores.reverse().forEach((winner, index) => {
+                    setTimeout(() => {
+                        const place = scores.length - index;
+                        const winnerDiv = document.createElement('div');
+                        winnerDiv.className = 'winner-card';
+                        winnerDiv.style.animationDelay = `${delay}s`;
+                        winnerDiv.innerHTML = `
+                            <div class="place">${place}${getOrdinalSuffix(place)} Place</div>
+                            <div>${winner.name}</div>
+                            <div class="score">${winner.score} points</div>
+                        `;
+                        winnersContainer.appendChild(winnerDiv);
+                    }, delay * 1000);
+                    delay += 1;
+                });
+            };
+        });
+
+        function getOrdinalSuffix(i) {
+            const j = i % 10;
+            const k = i % 100;
+            if (j == 1 && k != 11) return "st";
+            if (j == 2 && k != 12) return "nd";
+            if (j == 3 && k != 13) return "rd";
+            return "th";
+        }
     </script>
 
     <style>

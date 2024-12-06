@@ -3,6 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <title>Kahoot Clone</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Montserrat', sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #46178f;
+            color: white;
+        }
+
+        #joinSection, #quiz {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        #nameInput {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        #joinBtn {
+            background-color: #26890c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #joinBtn:hover {
+            background-color: #1e6b09;
+        }
+
+        .question {
+            font-size: 1.5em;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+
+        #answerForm {
+            margin-top: 20px;
+        }
+
+        #answerInput {
+            padding: 15px;
+            font-size: 1.2em;
+            border: none;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        #submitAnswer {
+            background-color: #ff3355;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #submitAnswer:hover {
+            background-color: #e62e4c;
+        }
+
+        .waiting-message {
+            font-size: 1.2em;
+            margin: 20px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Add some responsiveness */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            #nameInput, #answerInput {
+                width: 90%;
+            }
+        }
+    </style>
 </head>
 <body>
     <div id="join">
@@ -20,13 +140,13 @@
     <h2 class="question"></h2>
     <form id="answerForm">
       <input type="text" id="answerInput" placeholder="Your Answer">
-      <button type="submit">Submit</button>
+      <button type="submit" id="submitAnswer">Submit</button>
     </form>
   </div>
 
   <div id="endGameSection" style="display: none;">
-    <h2>Quiz Complete!</h2>
-    <div id="winnersDisplay"></div>
+    <h1>Quiz Complete! 🎉</h1>
+    <p>Thanks for playing!</p>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
@@ -96,31 +216,5 @@
     }
   </script>
 
-  <style>
-    #endGameSection {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .winner-entry {
-        margin: 20px auto;
-        padding: 15px;
-        background-color: #f8f9fa;
-        border-radius: 5px;
-        max-width: 400px;
-        animation: slideIn 0.5s ease-out;
-    }
-
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(20px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-  </style>
 </body>
 </html>
