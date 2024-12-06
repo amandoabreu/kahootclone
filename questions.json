@@ -2,38 +2,27 @@
     "quiz1": [
         {
             "questionId": 1,
+            "type": "multiple_choice",
+            "question": "Hvilket land feirer jul ved å spise KFC som et tradisjonelt måltid, der reservasjoner må gjøres flere uker i forveien?",
+            "answers": [
+                { "text": "Japan", "isCorrect": true },
+                { "text": "Sør-Korea", "isCorrect": false },
+                { "text": "USA", "isCorrect": false },
+                { "text": "Kina", "isCorrect": false }
+            ],
+            "timeLimit": 25,
+            "image": "https://upload.wikimedia.org/wikipedia/en/thumb/5/57/KFC_logo-image.svg/1200px-KFC_logo-image.svg.png"
+        },
+        {
+            "questionId": 2,
             "type": "open_ended",
-            "question": "Hvilken by er dette?",
+            "question": "Hvilken Norsk by er dette?",
             "correctAnswers": ["Hønefoss", "hønefoss"],
             "timeLimit": 30,
             "image": "/images/chicken.webp"
         },
         {
-            "questionId": 2,
-            "type": "open_ended",
-            "question": "Hvilken by er dette?",
-            "correctAnswers": ["Kristiansand", "kristiansand"],
-            "timeLimit": 30,
-            "image": "/images/duck.png"
-        },
-        {
             "questionId": 3,
-            "type": "open_ended",
-            "question": "Hvilken by er dette?",
-            "correctAnswers": ["Hammerfest", "hammerfest"],
-            "timeLimit": 30,
-            "image": "/images/party.webp"
-        },
-        {
-            "questionId": 4,
-            "type": "open_ended",
-            "question": "Hvilken by er dette?",
-            "correctAnswers": ["Lillehammer", "lillehammer"],
-            "timeLimit": 30,
-            "image": "/images/small.webp"
-        },
-        {
-            "questionId": 5,
             "type": "multiple_choice",
             "question": "Hva heter stjernen som ledet de tre vise menn til Jesusbarnet?",
             "answers": [
@@ -46,7 +35,15 @@
             "image": "https://media3.s-nbcnews.com/i/streams/2012/December/121224/1C5298957-TZ-Star-of-Bethlehem.jpg"
         },
         {
-            "questionId": 6,
+            "questionId": 4,
+            "type": "open_ended",
+            "question": "Hvilken Norsk by er dette?",
+            "correctAnswers": ["Kristiansand", "kristiansand"],
+            "timeLimit": 30,
+            "image": "/images/duck.png"
+        },
+        {
+            "questionId": 5,
             "type": "multiple_choice",
             "question": "Hvilket land er hjemmet til Christmas Island, som ligger i Det indiske hav?",
             "answers": [
@@ -56,8 +53,38 @@
                 { "text": "Thailand", "isCorrect": false }
             ],
             "timeLimit": 25,
-            "image": "https://upload.wikimedia.org/wikipedia/commons/8/88/Christmas_Island_satellite_image.jpg"
+            "image": "https://photos.smugmug.com/Gallery/Australia/Christmas-Island/i-Rb5PVvm/1/M7gPTNphhxgH78sDjHhBtnrSSJ4BzzCkZkQbkqMV6/L/Photo%2074-L.jpg"
+        },
+        {
+            "questionId": 6,
+            "type": "open_ended",
+            "question": "Hvilken Norsk by er dette?",
+            "correctAnswers": ["Hammerfest", "hammerfest"],
+            "timeLimit": 30,
+            "image": "/images/party.webp"
+        },
+        {
+            "questionId": 7,
+            "type": "multiple_choice",
+            "question": "Hvilket land har en tradisjon med å pynte banan- og mangotrær til jul i stedet for grantrær?",
+            "answers": [
+                { "text": "India", "isCorrect": true },
+                { "text": "Brasil", "isCorrect": false },
+                { "text": "Thailand", "isCorrect": false },
+                { "text": "Kenya", "isCorrect": false }
+            ],
+            "timeLimit": 25,
+            "image": "https://i.pinimg.com/originals/ef/aa/3b/efaa3b2bb83caf87b18135714b63af41.jpg"
+        },
+        {
+            "questionId": 8,
+            "type": "open_ended",
+            "question": "Hvilken Norsk by er dette?",
+            "correctAnswers": ["Lillehammer", "lillehammer"],
+            "timeLimit": 30,
+            "image": "/images/small.webp"
         }
+        
         
     ]
   }
