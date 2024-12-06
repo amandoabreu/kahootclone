@@ -45,13 +45,7 @@ io.on('connection', (socket) => {
   socket.on('submitAnswer', (answer) => {
     if (!players[socket.id]) return;
     
-    // Safety check for current question
-    if (currentQuestionIndex <= 0 || currentQuestionIndex > quizQuestions.length) {
-        console.log('Invalid question index:', currentQuestionIndex);
-        return;
-    }
-
-    const currentQuestion = quizQuestions[currentQuestionIndex - 1];
+    const currentQuestion = quizQuestions[currentQuestionIndex];
     if (!currentQuestion) {
         console.log('No question found at index:', currentQuestionIndex);
         return;
@@ -60,12 +54,17 @@ io.on('connection', (socket) => {
     const timeElapsed = (Date.now() - questionStartTime) / 1000;
     let isCorrect = false;
     
+    console.log('Answer received:', answer);  // Debug log
+    console.log('Current question:', currentQuestion);  // Debug log
+    
     // Now we can safely check the question type
     if (currentQuestion.type === 'multiple_choice') {
         const correctAnswer = currentQuestion.answers.find(a => a.isCorrect)?.text;
         isCorrect = answer.toLowerCase() === correctAnswer.toLowerCase();
+        console.log('Multiple choice - Correct answer:', correctAnswer, 'Given answer:', answer, 'Is correct:', isCorrect);  // Debug log
     } else {
         isCorrect = currentQuestion.correctAnswers.includes(answer.toLowerCase());
+        console.log('Open ended - Correct answers:', currentQuestion.correctAnswers, 'Given answer:', answer, 'Is correct:', isCorrect);  // Debug log
     }
 
     // Calculate points
@@ -75,7 +74,11 @@ io.on('connection', (socket) => {
             Math.floor(MAX_POINTS * (1 - timeElapsed/currentQuestion.timeLimit))
         );
         players[socket.id].score += points;
-        console.log(`${players[socket.id].name} scored ${points} points`);
+        console.log(`Score calculation:
+            Time elapsed: ${timeElapsed}s
+            Time limit: ${currentQuestion.timeLimit}s
+            Points calculated: ${points}
+            Player total score now: ${players[socket.id].score}`);  // Debug log
     }
 
     players[socket.id].currentAnswer = answer;
