@@ -216,7 +216,7 @@
 
         socket.on('addedPlayer', (playerName) => {
             const playerDiv = document.createElement('div');
-            playerDiv.textContent = `${playerName} joined the quiz!`;
+            playerDiv.textContent = `${playerName}`;
             document.getElementById('playerList').appendChild(playerDiv);
         });
 
@@ -254,36 +254,37 @@
         };
 
         socket.on('quizEnd', (scores) => {
+            console.log('Quiz ended with scores:', scores);  // Debug log
             document.getElementById('questionSection').style.display = 'none';
             document.getElementById('endGameSection').style.display = 'block';
             
             const showWinnersBtn = document.getElementById('revealWinnersBtn');
             const winnersContainer = document.getElementById('winnersContainer');
             
-            // Check if anyone scored points
-            const hasScores = scores.some(player => player.score > 0);
-            
-            if (!hasScores) {
-                showWinnersBtn.style.display = 'none';
-                winnersContainer.innerHTML = '<h2>No points scored in this quiz!</h2>';
-                return;
-            }
+            // Make sure scores is an array and has at least player names
+            const scoresArray = Array.isArray(scores) ? scores : [];
             
             showWinnersBtn.onclick = () => {
+                console.log('Button clicked');  // Debug log
                 showWinnersBtn.style.display = 'none';
                 let delay = 0;
                 
-                // Show winners from last to first
-                scores.reverse().forEach((winner, index) => {
+                // Always shuffle when testing/no scores
+                const displayScores = shuffleArray([...scoresArray]);
+                console.log('Display scores:', displayScores);  // Debug log
+                
+                // Show players from last to first
+                displayScores.reverse().forEach((player, index) => {
                     setTimeout(() => {
-                        const place = scores.length - index;
+                        console.log('Creating player div for:', player);  // Debug log
+                        const place = displayScores.length - index;
                         const winnerDiv = document.createElement('div');
                         winnerDiv.className = 'winner-card';
                         winnerDiv.style.animationDelay = `${delay}s`;
                         winnerDiv.innerHTML = `
                             <div class="place">${place}${getOrdinalSuffix(place)} Place</div>
-                            <div>${winner.name}</div>
-                            <div class="score">${winner.score} points</div>
+                            <div>${player.name}</div>
+                            <div class="score">${player.score || 0} points</div>
                         `;
                         winnersContainer.appendChild(winnerDiv);
                     }, delay * 1000);
@@ -291,6 +292,15 @@
                 });
             };
         });
+
+        // Fisher-Yates shuffle algorithm
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
 
         function getOrdinalSuffix(i) {
             const j = i % 10;
