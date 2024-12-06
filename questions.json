@@ -3,32 +3,62 @@
         {
             "questionId": 1,
             "type": "open_ended",
-            "question": "What is this?",
-            "correctAnswers": ["kitten", "Kitten", "cat"],
-            "timeLimit": 15,
-            "image": "https://d2zp5xs5cp8zlg.cloudfront.net/image-86754-800.jpg"
+            "question": "Hvilken by er dette?",
+            "correctAnswers": ["Hønefoss", "hønefoss"],
+            "timeLimit": 30,
+            "image": "/images/chicken.webp"
         },
         {
             "questionId": 2,
             "type": "open_ended",
-            "question": "What is this?",
-            "correctAnswers": ["computer", "quantum computer", "quantum"],
-            "timeLimit": 15,
-            "image": "https://www.popsci.com/wp-content/uploads/2022/09/06/IMG_6219-1-scaled.jpg?quality=85&w=2560"
+            "question": "Hvilken by er dette?",
+            "correctAnswers": ["Kristiansand", "kristiansand"],
+            "timeLimit": 30,
+            "image": "/images/duck.png"
         },
         {
             "questionId": 3,
-            "type": "multiple_choice",
+            "type": "open_ended",
             "question": "Hvilken by er dette?",
+            "correctAnswers": ["Hammerfest", "hammerfest"],
+            "timeLimit": 30,
+            "image": "/images/party.webp"
+        },
+        {
+            "questionId": 4,
+            "type": "open_ended",
+            "question": "Hvilken by er dette?",
+            "correctAnswers": ["Lillehammer", "lillehammer"],
+            "timeLimit": 30,
+            "image": "/images/small.webp"
+        },
+        {
+            "questionId": 5,
+            "type": "multiple_choice",
+            "question": "Hva heter stjernen som ledet de tre vise menn til Jesusbarnet?",
             "answers": [
-            { "text": "Berlin", "isCorrect": false },
-            { "text": "Madrid", "isCorrect": false },
-            { "text": "Paris", "isCorrect": true },
-            { "text": "Rome", "isCorrect": false }
+            { "text": "Julestjernen", "isCorrect": false },
+            { "text": "Davidsstjernen", "isCorrect": false },
+            { "text": "Betlehemsstjernen", "isCorrect": true },
+            { "text": "Nordstjernen", "isCorrect": false }
             ],
-            "timeLimit": 15,
-            "image": "https://assets.voxcity.com/uploads/blog_images/paris-blog-updated_original.jpg"
+            "timeLimit": 25,
+            "image": "https://media3.s-nbcnews.com/i/streams/2012/December/121224/1C5298957-TZ-Star-of-Bethlehem.jpg"
+        },
+        {
+            "questionId": 6,
+            "type": "multiple_choice",
+            "question": "Hvilket land er hjemmet til Christmas Island, som ligger i Det indiske hav?",
+            "answers": [
+                { "text": "Australia", "isCorrect": true },
+                { "text": "Indonesia", "isCorrect": false },
+                { "text": "India", "isCorrect": false },
+                { "text": "Thailand", "isCorrect": false }
+            ],
+            "timeLimit": 25,
+            "image": "https://upload.wikimedia.org/wikipedia/commons/8/88/Christmas_Island_satellite_image.jpg"
         }
+        
     ]
   }
   

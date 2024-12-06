@@ -39,6 +39,21 @@
             background-color: #1e6b09;
         }
 
+        #revealWinnersBtn {
+            background-color: #26890c;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #revealWinnersBtn:hover {
+            background-color: #1e6b09;
+        }
+
         #playerList {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -125,6 +140,15 @@
             }
         }
 
+        @keyframes vibrate {
+            0% { transform: rotate(0deg); }
+            20% { transform: rotate(-3deg); }
+            40% { transform: rotate(3deg); }
+            60% { transform: rotate(-3deg); }
+            80% { transform: rotate(3deg); }
+            100% { transform: rotate(0deg); }
+        }   
+
         #endGameSection {
         text-align: center;
         max-width: 800px;
@@ -182,6 +206,13 @@
             transform: translateY(0);
         }
     }
+
+    #loadingWinners {
+        margin: 20px 0;
+        display:none;
+        font-size: 6em;
+        animation: vibrate 0.5s infinite;
+    }
     </style>
 </head>
 <body>
@@ -202,6 +233,7 @@
     <div id="endGameSection" style="display: none;">
         <h1>Quiz Complete!</h1>
         <button id="revealWinnersBtn">Reveal Winners</button>
+        <div id="loadingWinners"></div>
         <div id="winnersContainer"></div>
     </div>
 
@@ -255,11 +287,29 @@
         
 
         socket.on('quizEnd', (scores) => {
+
+            /**
+            scores = [
+                {
+                    "name": "dsadsa",
+                    "score": 1648
+                },
+                {
+                    "name": "kjh",
+                    "score": 3648
+                },
+                {
+                     "name": "4565",
+                    "score": 164
+                }
+            ];
+            */
             console.log('Quiz ended with scores:', scores);  // Debug log
             document.getElementById('questionSection').style.display = 'none';
             document.getElementById('endGameSection').style.display = 'block';
             
             const showWinnersBtn = document.getElementById('revealWinnersBtn');
+            const loadingWinners = document.getElementById('loadingWinners');
             const winnersContainer = document.getElementById('winnersContainer');
             
             // Make sure scores is an array and has at least player names
@@ -268,10 +318,13 @@
             showWinnersBtn.onclick = () => {
                 console.log('Button clicked');  // Debug log
                 showWinnersBtn.style.display = 'none';
+                loadingWinners.style.display = 'block';
+                loadingWinners.textContent = '🥁';
                 let delay = 0;
                 
                 // Always shuffle when testing/no scores
-                const displayScores = shuffleArray([...scoresArray]);
+                // Sort scores from highest to lowest
+                const displayScores = [...scoresArray].sort((a, b) => b.score - a.score);
                 console.log('Display scores:', displayScores);  // Debug log
                 
                 // Show players from last to first
@@ -287,10 +340,13 @@
                             <div>${player.name}</div>
                             <div class="score">${player.score || 0} points</div>
                         `;
-                        winnersContainer.appendChild(winnerDiv);
-                    }, delay * 1000);
+                        winnersContainer.prepend(winnerDiv);
+                    }, delay * 2000);
                     delay += 1;
                 });
+                setTimeout(() => {
+                    loadingWinners.style.display = 'none';
+                }, ((displayScores.length + 1) * 2000));
             };
         });
 
