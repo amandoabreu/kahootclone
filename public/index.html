@@ -188,12 +188,39 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        
-        // Join
+        // Update socket connection with reconnection options
+        const socket = io({
+            reconnection: true,
+            reconnectionAttempts: 10,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 20000
+        });
+
+        // Add connection handlers
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            
+            // If user was already in a game (had a name), try to rejoin
+            const playerName = localStorage.getItem('playerName');
+            if (playerName) {
+                socket.emit('rejoinGame', playerName);
+            }
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+
+        socket.on('reconnect', () => {
+            console.log('Reconnected to server');
+        });
+
+        // Update join button handler to save name
         document.getElementById('joinButton').onclick = () => {
             const name = document.getElementById('nameInput').value.trim();
             if (name) {
+                localStorage.setItem('playerName', name);
                 socket.emit('joinQuiz', name);
                 document.getElementById('joinSection').style.display = 'none';
                 document.getElementById('waiting').style.display = 'block';

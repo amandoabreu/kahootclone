@@ -83,13 +83,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    if (players[socket.id]) {
-      console.log(`${players[socket.id].name} disconnected`);
-      delete players[socket.id];
-      io.emit('playerList', getPlayerNames());
-    } else {
-      console.log('A user disconnected before joining.');
-    }
+    console.log('User disconnected:', socket.id);
+    // Don't remove player immediately, give them chance to reconnect
+    setTimeout(() => {
+        if (!socket.connected && players[socket.id]) {
+            delete players[socket.id];
+            io.emit('playerLeft', socket.playerName);
+        }
+    }, 60000); // Wait 1 minute before removing player
   });
 
   // New handler for quiz start button
@@ -112,6 +113,36 @@ io.on('connection', (socket) => {
             score: winner.score,
             place: place
         });
+    }
+  });
+
+  // Add to your server-side socket handlers
+  socket.on('rejoinGame', (playerName) => {
+    // Check if player was in the game
+    const existingPlayer = Object.values(players).find(p => p.name === playerName);
+    if (existingPlayer) {
+        // Update socket id for reconnected player
+        players[socket.id] = {
+            ...existingPlayer,
+            socketId: socket.id
+        };
+        
+        // Send current game state
+        if (quizInProgress) {
+            const currentQuestion = quizQuestions[currentQuestionIndex];
+            if (currentQuestion) {
+                socket.emit('question', {
+                    type: currentQuestion.type,
+                    timeLimit: currentQuestion.timeLimit,
+                    answers: currentQuestion.type === "multiple_choice" ? 
+                        currentQuestion.answers.map(a => a.text) : null,
+                    question: currentQuestion.question,
+                    image: currentQuestion.image || null   
+                });
+            }
+        } else {
+            socket.emit('waiting');
+        }
     }
   });
 });
